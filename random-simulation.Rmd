@@ -1,0 +1,61 @@
+---
+title: "Statistical Analysis, MSCA 31007, Lecture 2"
+author: "Hope Foster-Reyes"
+date: "October 7, 2016"
+output: pdf_document
+---
+
+# Simulation of Random Variables
+
+**Requires packages: random, compositions.**
+
+## Part 1. Generate uniformly distributed random numbers
+
+## 1.1 Use runif().
+
+```{r q1.1}
+# Simulate n pseudo-random numbers uniformly distributed on [a,b]
+set.seed(15)
+sample.runif <- runif(1000, 0, 1)
+str(sample.runif)
+head(sample.runif)
+quantile(sample.runif)
+hist(sample.runif, main = "1000 Pseudo-Random Numbers via Runif()")
+boxplot(sample.runif, main = "1000 Pseudo-Random Numbers via Runif()")
+```
+
+## 1.2 Simulate Uniform Random Sample on [0,1] Using Random.org.
+
+```{r q1.2}
+# Load random package to interface with random.org
+library(random)
+
+# Download binary sequence from random.org
+num.flips <- 1000
+data.random.org <- randomNumbers(n = num.flips, min = 0, max = 1, col = 1, base = 2, check = T)
+head(data.random.org)
+```
+
+### Let us turn our sequence of {0,1} into uniform random numbers on [0,1].
+
+```{r q1.2-transform}
+# Load compositions package
+suppressMessages(library(compositions))
+
+# Create function that turns a sequence of zeros and ones of length n into decimal form
+BinaryToDec <- function(binary.seq){
+  # Argument binary.seq: vector containing a binary sequency of 0's and 1's
+  unbinary(paste(binary.seq, collapse = ""))
+}
+
+# Demonstrate function
+BinaryToDec(c(1,1,1,1,1,0))
+
+# Turn the sequence of 0's and 1's from random.org into a 10x100 matrix
+matrix.binary <- matrix(data.random.org, ncol = 10)
+head(matrix.binary)
+
+# Transform each row into decimal format
+
+```
+
