@@ -7,7 +7,11 @@ output: pdf_document
 
 # Simulation of Random Variables
 
-**Requires packages: random, compositions.**
+_Notes_
+
+* _Style Guide: https://google.github.io/styleguide/Rguide.xml#functiondefinition _
+
+* _Packages required: random, compositions._
 
 ## Part 1. Generate uniformly distributed random numbers
 
@@ -32,30 +36,52 @@ library(random)
 
 # Download binary sequence from random.org
 num.flips <- 1000
-data.random.org <- randomNumbers(n = num.flips, min = 0, max = 1, col = 1, base = 2, check = T)
+data.random.org <- randomNumbers(n = num.flips, min = 0, max = 1, 
+                                 col = 1, base = 2, check = TRUE)
 head(data.random.org)
 ```
 
-### Let us turn our sequence of {0,1} into uniform random numbers on [0,1].
+**Let us turn our sequence of {0,1} into uniform random numbers on [0,1].**
 
 ```{r q1.2-transform}
 # Load compositions package
 suppressMessages(library(compositions))
 
-# Create function that turns a sequence of zeros and ones of length n into decimal form
+# Create function that interprets a sequence of zeros and ones of length n as a binary
+#   number and converts that binary into decimal
 BinaryToDec <- function(binary.seq){
-  # Argument binary.seq: vector containing a binary sequency of 0's and 1's
+  # Argument binary.seq: vector containing a binary sequence of 0's and 1's
   unbinary(paste(binary.seq, collapse = ""))
 }
 
 # Demonstrate function
 BinaryToDec(c(1,1,1,1,1,0))
 
-# Turn the sequence of 0's and 1's from random.org into a 10x100 matrix
+# Turn the sequence of 0's and 1's from random.org into a 100x10 matrix
 matrix.binary <- matrix(data.random.org, ncol = 10)
 head(matrix.binary)
+str(matrix.binary)
 
 # Transform each row into decimal format
+vector.decimal <- apply(matrix.binary, 1, BinaryToDec)
+str(vector.decimal)
 
+# Divide the numbers by 2^10 to make real numbers in [0,1]
+sample.random.org <- vector.decimal / 2^10
+sample.random.org
+quantile(sample.random.org)
+hist(sample.random.org, main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
+boxplot(sample.random.org, main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
 ```
+
+All numbers in sample.random.org are between 0 and 1. This is our equivalent of the sample obtained by runif().
+
+## Part 2. Test random number generator
+
+## 2.1 Test uniformity of distribution of both random number generators
+
+### 2.1.1. Sample obtained by runif()
+
+Analyze what was simulated.
+
 
