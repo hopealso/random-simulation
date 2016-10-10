@@ -24,8 +24,6 @@ sample.runif <- runif(1000, 0, 1)
 str(sample.runif)
 head(sample.runif)
 quantile(sample.runif)
-hist(sample.runif, main = "1000 Pseudo-Random Numbers via Runif()")
-boxplot(sample.runif, main = "1000 Pseudo-Random Numbers via Runif()")
 ```
 
 ## 1.2 Simulate Uniform Random Sample on [0,1] Using Random.org.
@@ -68,10 +66,9 @@ str(vector.decimal)
 
 # Divide the numbers by 2^10 to make real numbers in [0,1]
 sample.random.org <- vector.decimal / 2^10
+str(sample.random.org)
 sample.random.org
 quantile(sample.random.org)
-hist(sample.random.org, main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
-boxplot(sample.random.org, main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
 ```
 
 All numbers in sample.random.org are between 0 and 1. This is our equivalent of the sample obtained by runif().
@@ -83,6 +80,31 @@ All numbers in sample.random.org are between 0 and 1. This is our equivalent of 
 ### 2.1.1. Sample obtained by runif()
 
 Analyze what was simulated.
+
+```{r q2-1-1-hist}
+hist.sample.runif <- hist(sample.runif, 
+                          main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
+hist.sample.runif
+boxplot(sample.runif, 
+        main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
+```
+
+***What does the histogram tell you about the distribution? Is it consistent with the goal of simulation?***
+
+??? XXX ???
+
+Estimate mean and standard deviation.
+
+
+
+
+### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
+
+```{r q2-1-2-hist}
+hist.random.org <- hist(sample.random.org, main = "1000 Pseudo-Random Numbers via Runif()")
+hist.random.org
+boxplot(sample.random.org, main = "1000 Pseudo-Random Numbers via Runif()")
+```
 
 ## Workshop: Simulation of random variables using distribution function and inverse distribution function
 
@@ -97,14 +119,5 @@ abline(v=xNorm[30],col="green",lwd=3)
 lines(xNorm,dnorm(xNorm),lwd=3,col="red")
 ```
 
-```{r inv-function-norm}
-xBinom<-qbinom((1:99)/100, size = 1, prob = 0.8)
-yBinom<-pbinom(xBinom, size = 1, prob = 0.8)
-plot(xBinom,yBinom,pch=16)
-abline(h=yBinom)
-abline(v=xBinom)
-abline(h=yBinom[30],col="green",lwd=3)
-abline(v=xBinom[30],col="green",lwd=3)
-lines(xBinom,dbinom(xBinom),lwd=3,col="red")
-```
+
 
