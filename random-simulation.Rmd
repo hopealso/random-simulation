@@ -11,11 +11,15 @@ _Notes_
 
 * _Style Guide: https://google.github.io/styleguide/Rguide.xml#functiondefinition _
 
-* _Packages required: random, compositions._
+* _Packages required: random, compositions, randtests._
+
+```{r settings, echo=FALSE}
+options(scipen = 5)
+```
 
 ## Part 1. Generate uniformly distributed random numbers
 
-## 1.1 Use runif().
+## 1.1. Use runif().
 
 ```{r q1.1}
 # Simulate n pseudo-random numbers uniformly distributed on [a,b]
@@ -26,12 +30,14 @@ head(sample.runif)
 quantile(sample.runif)
 ```
 
-## 1.2 Simulate Uniform Random Sample on [0,1] Using Random.org.
+## 1.2. Simulate Uniform Random Sample on [0,1] Using Random.org.
 
-```{r q1.2}
+```{r q1.2-load1, results='hide'}
 # Load random package to interface with random.org
 library(random)
+```
 
+```{r q1.2}
 # Download binary sequence from random.org
 num.flips <- 1000
 data.random.org <- randomNumbers(n = num.flips, min = 0, max = 1, 
@@ -41,10 +47,12 @@ head(data.random.org)
 
 **Let us turn our sequence of {0,1} into uniform random numbers on [0,1].**
 
-```{r q1.2-transform}
+```{r q1.2-load2, results='hide'}
 # Load compositions package
 suppressMessages(library(compositions))
+```
 
+```{r q1.2-transform}
 # Create function that interprets a sequence of zeros and ones of length n as a binary
 #   number and converts that binary into decimal
 BinaryToDec <- function(binary.seq){
@@ -75,36 +83,180 @@ All numbers in sample.random.org are between 0 and 1. This is our equivalent of 
 
 ## Part 2. Test random number generator
 
-## 2.1 Test uniformity of distribution of both random number generators
+## 2.1. Test uniformity of distribution of both random number generators
 
 ### 2.1.1. Sample obtained by runif()
 
 Analyze what was simulated.
 
 ```{r q2-1-1-hist}
-hist.sample.runif <- hist(sample.runif, 
-                          main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
-hist.sample.runif
-boxplot(sample.runif, 
-        main = "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data")
+title.runif <- "1000 Pseudo-Random Numbers via Runif()"
+hist.runif <- hist(sample.runif, main = title.runif)
+hist.runif
+boxplot(sample.runif, main = title.runif)
 ```
 
 ***What does the histogram tell you about the distribution? Is it consistent with the goal of simulation?***
 
 ??? XXX ???
 
-Estimate mean and standard deviation.
+Estimate mean and standard deviation of our sample's density.
 
+```{r q2-1-1-spread}
+(hist.runif.mean <- mean(hist.runif$density))
+(hist.runif.sd <- sd(hist.runif$density))
 
+plot(hist.runif, freq = FALSE, main = paste("Spread of", title.runif))
+abline(h = hist.runif.mean)
+abline(h = hist.runif.mean + 1.96 * hist.runif.sd, col = "red", lty = 2)
+abline(h = hist.runif.mean - 1.96 * hist.runif.sd, col = "red", lty = 2)
+```
 
+***What does the graph tell you about the observed distribution?***
+
+??? XXX ???
+
+Estimate the moments of the sample.
+
+```{r q2-1-1-moments}
+(sample.runif.mean <- mean(sample.runif))
+(sample.runif.var <- var(sample.runif))
+```
+
+***What do you conclude about the estimated distribution from the moments?***
+
+??? XXX ???
+
+Check the summary of the simulated sample.
+
+```{r q2-1-1-iqr}
+summary(sample.runif)
+```
+
+***What do you think is the best way of estimating uniform distribution over unknown interval?***
+
+??? XXX ???
 
 ### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
 
+Analyze what was simulated.
+
 ```{r q2-1-2-hist}
-hist.random.org <- hist(sample.random.org, main = "1000 Pseudo-Random Numbers via Runif()")
+title.random.org <- "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data"
+hist.random.org <- hist(sample.random.org, main = title.random.org)
 hist.random.org
-boxplot(sample.random.org, main = "1000 Pseudo-Random Numbers via Runif()")
+boxplot(sample.random.org, main = title.random.org)
 ```
+
+***What does the histogram tell you about the distribution? Is it consistent with the goal of simulation?***
+
+In other words, we know that our goal is a unified distribution on [0,1]. In a unified distribution on [0,1], as the size of the sample increases, the frequency of the outcomes should approach being equal, and their density should approach 1. 
+
+Since the densities of our sample should approach 1 and be equal, their mean of course should also approach 1 and should not deviate excessively.
+
+??? XXX ???
+
+Estimate mean and standard deviation of our sample's density.
+
+```{r q2-1-2-spread}
+(hist.random.org.mean <- mean(hist.random.org$density))
+(hist.random.org.sd <- sd(hist.random.org$density))
+
+plot(hist.random.org, freq = FALSE, main = paste("Spread of", title.random.org))
+abline(h = hist.random.org.mean)
+abline(h = hist.random.org.mean + 1.96 * hist.random.org.sd, col = "red", lty = 2)
+abline(h = hist.random.org.mean - 1.96 * hist.random.org.sd, col = "red", lty = 2)
+```
+
+***What does the graph tell you about the observed distribution?***
+
+??? XXX ???
+
+Estimate the moments of the sample.
+
+```{r q2-1-2-moments}
+(sample.random.org.mean <- mean(sample.random.org))
+(sample.random.org.var <- var(sample.random.org))
+```
+
+***What do you conclude about the estimated distribution from the moments?***
+
+??? XXX ???
+
+Check the summary of the simulated sample.
+
+```{r q2-1-2-iqr}
+summary(sample.random.org)
+```
+
+??? XXX ???
+
+## 2.2. Test independence of the sequence of zeros and ones
+
+### 2.2.1. Turning point test
+
+Check if a sequence of numbers is i.i.d. (independent identically distributed) based on the number of turning points in the sequence.
+
+The number of turning points is the number of maxima and minima in the series. The statistic of the test has a standard normal distribution and is performed by turning.point.test() in package randtests.
+
+```{r q2-2-1-load, results='hide'}
+library(randtests)
+```
+
+```{r q2-2-1}
+turning.point.test(sample.random.org)
+```
+
+The null hypothesis tested by turning point test is randomness (i.i.d.). The alternative is serial correlation in the sequence. Thus, if the test returns a very small p-value the randomness needs to be rejected.
+
+## 2.3. Test frequency by Monobit test
+
+To perform Monobit test you need to transform your {0,1} sample into {-1,1}.
+
+```{r q2-3-transform}
+data.random.org.plusminus1 <- (data.random.org - .5) * 2
+```
+
+The monobit test can be calculated in R with the help of pnorm. The test checks that the the p-value or complimentary error function of a statistic S is less than or equal to 0.01. If not, the sequence fails the test.
+
+```{r q2-3}
+erf.monobit <- function(x) 2 * pnorm(x * sqrt(2)) - 1
+erfc.monobit <- function(x) 2 * pnorm(x * sqrt(2), lower = FALSE)
+
+# Chart the complimentary error function
+plot(seq(from = -3, to = 3, by = 0.5), erfc.monobit(seq(from = -3, to = 3, by = 0.5)),
+     type = "l", xlab = "x", ylab = "erfc.monobit(x)")
+
+# Calculate our S statistic
+s.monobit.random.org <- abs(sum(data.random.org.plusminus1) / sqrt( 2* num.flips))
+
+# Find the p-value or erfc(S)
+erfc.monobit(s.monobit.random.org)
+```
+
+The test shows that our sequence passes.
+
+Now check each of the sub-sequences created earlier:
+
+```{r q2-3-subsseq}
+# Create matrix of sub-sequences
+matrix.plusminus1 <- matrix(data.random.org.plusminus1, ncol=50)
+
+# Find p-value of vector of S statistics for every sub-sequence
+erfc.random.org.subseq <- erfc.monobit(abs(apply(matrix.plusminus1, 1, sum)) / sqrt(2 * 50))
+
+# Plot
+plot(erfc.random.org.subseq, ylab = "P-Values", 
+     main = "Monobit Complimentary Error Function on 20 Sequences of Random.org Data")
+```
+
+***How many runs out of 20 fail the test?***
+
+```{r q2-3-subseq-test}
+sum(erfc.random.org.subseq <= 0.01)
+```
+
+## Part 3. Invent a random number generator
 
 ## Workshop: Simulation of random variables using distribution function and inverse distribution function
 
