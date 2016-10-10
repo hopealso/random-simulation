@@ -13,6 +13,8 @@ _Notes_
 
 * _Packages required: random, compositions, randtests._
 
+* _Files required: ScratchOffMonteCarlo.rda; store in RStudio project directory_
+
 ```{r settings, echo=FALSE}
 options(scipen = 5)
 ```
@@ -256,7 +258,144 @@ plot(erfc.random.org.subseq, ylab = "P-Values",
 sum(erfc.random.org.subseq <= 0.01)
 ```
 
+We can confirm that the random sequences provided by Random.org pass the monobit test.
+
 ## Part 3. Invent a random number generator
+
+??? XXX ???
+
+## Part 4. Monte Carlo Method
+
+## 4.1. Scratch off quote of the day: fuction download
+
+```{r q4-1-load, results='hide'}
+filename <- ScratchOffMonteCarlo.rda
+
+#path <- "{Path to the folder with ScratchOffMonteCarlo.rda}"
+#load(file = paste(path, filename,sep= '/ '))
+
+# Place ScratchOffMonteCarlo file in project directory or use code above
+load(filename)
+```
+
+## 4.2. Simulate pseudo-random poins [x,y][x,y] on [0,100]×[0,100]
+
+The ScratchOffMonteCarlo function simulates 'scratching off the paint' covering an image at each x, y coordinate. Let's try creating 1000 pseudo-random x, y coordinates and see if the image is readable.
+
+```{r q4-1-example}
+# Set seed
+seed1 <- 938364
+set.seed(seed1)
+
+# Set sample size
+mc.n <- 1000
+
+# Simulate n * 2 pseudo-random numbers uniformly distributed on [0, 100]
+mc.xy <- runif(2 * mc.n, min = 0, max = 100)
+
+# Transform into n x 2 matrix
+mc.xy <- matrix(mc.xy, ncol = 2)
+str(mc.xy)
+head(mc.xy)
+
+# Simulate 'scratching off the paint' covering an image at each x, y coordinate
+ScratchOffMonteCarlo(mc.xy)
+```
+
+Let's adjust the sample size and seed and try to make the quote in our image readable with minimum sample size.
+
+```{r q4-1-trials}
+# Create function to generate coordinate matrix
+xy <- function(n, seed) {
+  # Argument n: Number of x, y coordinate samples to generate
+  # Argument seed: Seed to ensure reproducibility
+  
+  # Simulate n * 2 pseudo-random numbers uniformly distributed on [0, 100]
+  set.seed(seed)
+  xy <- runif(2 * n, min = 0, max = 100)
+
+  # Transform into n x 2 matrix
+  xy <- matrix(xy, ncol = 2)
+}
+
+# Seed 1 5k:
+mc2.n <- 5000
+mc2.xy <- xy(mc2.n, seed1)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 5k:
+seed2 <- 112233
+mc2.n <- 5000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 1 10k:
+mc2.n <- 10000
+mc2.xy <- xy(mc2.n, seed1)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 10k:
+mc2.n <- 10000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 1 15k:
+mc2.n <- 15000
+mc2.xy <- xy(mc2.n, seed1)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 15k:
+mc2.n <- 15000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 3 15k:
+seed3 <- 999999
+mc2.n <- 15000
+mc2.xy <- xy(mc2.n, seed3)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 19k:
+mc2.n <- 19000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 23k:
+mc2.n <- 23000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 2 25k:
+mc2.n <- 25000
+mc2.xy <- xy(mc2.n, seed2)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 1 25k:
+mc2.n <- 25000
+mc2.xy <- xy(mc2.n, seed1)
+ScratchOffMonteCarlo(mc2.xy)
+
+# Seed 3 25k:
+mc2.n <- 25000
+mc2.xy <- xy(mc2.n, seed3)
+ScratchOffMonteCarlo(mc2.xy)
+```
+
+***What percent you needed to scratch off to make the quote readable?***
+
+It appears we need to scratch off approximately 90% of the paint to make the quote and its author readable. (We can read the English words at less due to the cognitive ability to fill in letters in words that match existing patterns, but unknown names require more letters to be readable.)
+
+## 4.3. Simulate quasi-random poins [x,y][x,y] on [0,100]×[0,100]
+
+Again, by changing nSample and my.seed we try to make the quote of the day readable with minimum sample size.
+
+***What percent you needed to scratch off to make the quote readable?***
+
+***Which of the Monte Carlo methods makes the quote readable sooner?***
+
+***Which parameters nSample and my.seed gave you the best result, what percent of the yellow paing you were able to scratch off by each method?***
+
+***Changing which of the two parameters plays more significant role?***
 
 ## Workshop: Simulation of random variables using distribution function and inverse distribution function
 
@@ -271,5 +410,22 @@ abline(v=xNorm[30],col="green",lwd=3)
 lines(xNorm,dnorm(xNorm),lwd=3,col="red")
 ```
 
+## Part 5. Test
 
+```{r q5}
+# Load data. (Data file must be located in RStudio project directory.)
+data <- read.csv('Week2_Test_Sample.csv', header = TRUE)$x
+
+# Using sample from uniform distribution, create sample from normal distribution. 
+data.norm <- qnorm(data[4:503], mean = data[1], sd = data[2])
+hist(data.norm)
+
+# Using sample from uniform distribution, create sample from exponential distribution.
+data.exp <- qexp(data[4:503], rate = data[3])
+hist(data.exp)
+
+# Output results to RStudio project directory
+result <- cbind(datNorm = data.norm, datExp = data.exp)
+write.csv(result, 'result.csv', row.names = FALSE)
+```
 
