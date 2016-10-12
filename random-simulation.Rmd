@@ -9,9 +9,9 @@ output: pdf_document
 
 _Notes_
 
-* _Style Guide: https://google.github.io/styleguide/Rguide.xml#functiondefinition _
+* _Style Guide: https://google.github.io/styleguide/Rguide.xml#functiondefinition_
 
-* _Packages required: random, compositions, randtests._
+* _Packages required: random, compositions, randtests, randtoolbox._
 
 * _Files required: ScratchOffMonteCarlo.rda; store in RStudio project directory_
 
@@ -319,66 +319,60 @@ xy <- function(n, seed) {
 }
 
 # Seed 1 5k:
-mc2.n <- 5000
-mc2.xy <- xy(mc2.n, seed1)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 5000
+mc5k.xy <- xy(mc.n, seed1)
+ScratchOffMonteCarlo(mc5k.xy)
 
 # Seed 2 5k:
 seed2 <- 112233
-mc2.n <- 5000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc5k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc5k.xy)
 
 # Seed 1 10k:
-mc2.n <- 10000
-mc2.xy <- xy(mc2.n, seed1)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 10000
+mc10k.xy <- xy(mc.n, seed1)
+ScratchOffMonteCarlo(mc10k.xy)
 
 # Seed 2 10k:
-mc2.n <- 10000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc10k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc10k.xy)
 
 # Seed 1 15k:
-mc2.n <- 15000
-mc2.xy <- xy(mc2.n, seed1)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 15000
+mc15k.xy <- xy(mc.n, seed1)
+ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 2 15k:
-mc2.n <- 15000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc15k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 3 15k:
 seed3 <- 999999
-mc2.n <- 15000
-mc2.xy <- xy(mc2.n, seed3)
-ScratchOffMonteCarlo(mc2.xy)
+mc15k.xy <- xy(mc.n, seed3)
+ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 2 19k:
-mc2.n <- 19000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 19000
+mc19k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc19k.xy)
 
 # Seed 2 23k:
-mc2.n <- 23000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 23000
+mc23k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc23k.xy)
 
 # Seed 2 25k:
-mc2.n <- 25000
-mc2.xy <- xy(mc2.n, seed2)
-ScratchOffMonteCarlo(mc2.xy)
+mc.n <- 25000
+mc25k.xy <- xy(mc.n, seed2)
+ScratchOffMonteCarlo(mc25k.xy)
 
 # Seed 1 25k:
-mc2.n <- 25000
-mc2.xy <- xy(mc2.n, seed1)
-ScratchOffMonteCarlo(mc2.xy)
+mc25k.xy <- xy(mc.n, seed1)
+ScratchOffMonteCarlo(mc25k.xy)
 
 # Seed 3 25k:
-mc2.n <- 25000
-mc2.xy <- xy(mc2.n, seed3)
-ScratchOffMonteCarlo(mc2.xy)
+mc25k.xy <- xy(mc.n, seed3)
+ScratchOffMonteCarlo(mc25k.xy)
 ```
 
 ***What percent you needed to scratch off to make the quote readable?***
@@ -386,6 +380,20 @@ ScratchOffMonteCarlo(mc2.xy)
 It appears we need to scratch off approximately 90% of the paint to make the quote and its author readable. (We can read the English words at less due to the cognitive ability to fill in letters in words that match existing patterns, but unknown names require more letters to be readable.)
 
 ## 4.3. Simulate quasi-random poins [x,y][x,y] on [0,100]×[0,100]
+
+We replace function runif() with sobol() from the library randtoolbox.
+
+```{r q4-3-load, results='hide'}
+library(randtoolbox)
+```
+
+```{r}
+seed4 <- 10
+set.seed(seed4)
+mc.n <- 10
+mc10.xy <- sobol(mc.n, dim = 2, init = T) * 100
+```
+
 
 Again, by changing nSample and my.seed we try to make the quote of the day readable with minimum sample size.
 
