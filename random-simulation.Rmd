@@ -9,7 +9,7 @@ output: pdf_document
 
 _Notes_
 
-* _Style Guide: https://google.github.io/styleguide/Rguide.xml#functiondefinition_
+* _Style Guide:_ https://google.github.io/styleguide/Rguide.xml#functiondefinition
 
 * _Packages required: random, compositions, randtests, randtoolbox._
 
@@ -21,12 +21,12 @@ options(scipen = 5)
 
 ## Part 1. Generate uniformly distributed random numbers
 
-## 1.1. Use runif().
+## 1.1. Use runif(), short for random (r) unified distribution (unif).
 
 ```{r q1.1}
 # Simulate n pseudo-random numbers uniformly distributed on [a,b]
 set.seed(15)
-sample.runif <- runif(1000, 0, 1)
+sample.runif <- runif(n = 1000, min = 0, max = 1)
 str(sample.runif)
 head(sample.runif)
 quantile(sample.runif)
@@ -34,7 +34,7 @@ quantile(sample.runif)
 
 ## 1.2. Simulate Uniform Random Sample on [0,1] Using Random.org.
 
-```{r q1.2-load1, results='hide'}
+```{r q1.2-load1, message=FALSE}
 # Load random package to interface with random.org
 library(random)
 ```
@@ -49,7 +49,7 @@ head(data.random.org)
 
 **Let us turn our sequence of {0,1} into uniform random numbers on [0,1].**
 
-```{r q1.2-load2, results='hide'}
+```{r q1.2-load2, message=FALSE}
 # Load compositions package
 suppressMessages(library(compositions))
 ```
@@ -100,7 +100,10 @@ boxplot(sample.runif, main = title.runif)
 
 ***What does the histogram tell you about the distribution? Is it consistent with the goal of simulation?***
 
-??? XXX ???
+Our goal was to simulate 1000 random numbers having a continuous uniform distribution between [0,1]. We have stored these 1000 numbers in a sample vector and graphed a histogram of this vector to examine whether we were successful.
+
+As seen in the histogram, when we group our 1000 numbers into bins of width one tenth (0.1), each of these bins holds approximately 100 numbers, with some variation. This is as expected (i.e. 1000/10 = 100 and 1/10 = 0.1). Our sample of continuous numbers appears to be evenly distributed between the bounds of 0 and 1, as expected for a distribution of X ~ Unif(0,1) and appears consistent with the goal of our simulation.
+
 
 Estimate mean and standard deviation of our sample's density.
 
@@ -116,7 +119,14 @@ abline(h = hist.runif.mean - 1.96 * hist.runif.sd, col = "red", lty = 2)
 
 ***What does the graph tell you about the observed distribution?***
 
-??? XXX ???
+The density of a histogram is calculated for each bin by dividing the number of observations in that bin by the width of the bin. Here, we can compare the density of our sample histogram's bins with the theoretical probability density of a uniform distribution.
+
+We know that for a theoretical continuous uniform distribution, the probability density of each individual value inside its bounds is 1 divided by the distance between its maximum and minimum value. Thus for such a distribution between 0 and 1, the density for every value within its bounds will be 1 / (1-0), or simply 1.
+
+For a sample taken from a continuous uniform distribution, we therefore would expect each of our bins to have a density close to 1, since the probability density of such a distribution remains at 1 throughout its range of values. 
+
+Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins has a mean of 1 and further is within one standard deviation of 1. Thus the mean and central tendency of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
+
 
 Estimate the moments of the sample.
 
@@ -127,7 +137,10 @@ Estimate the moments of the sample.
 
 ***What do you conclude about the estimated distribution from the moments?***
 
-??? XXX ???
+The first moment (mean) and the second central moment (variance) tell us, respectively, the center of our sample and the spread of our sample. These are also as expected. 
+
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of 0.516 is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or (1-0)/2). We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample mean of 0.084 is quite close to this.
+
 
 Check the summary of the simulated sample.
 
@@ -139,12 +152,13 @@ summary(sample.runif)
 
 ??? XXX ???
 
+
 ### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
 
 Analyze what was simulated.
 
 ```{r q2-1-2-hist}
-title.random.org <- "100 Pseudo-Random Numbers, Transformed from Random.org Binary Data"
+title.random.org <- "100 Pseudo-Random Numbers,\nTransformed from Random.org Binary Data"
 hist.random.org <- hist(sample.random.org, main = title.random.org)
 hist.random.org
 boxplot(sample.random.org, main = title.random.org)
@@ -152,11 +166,10 @@ boxplot(sample.random.org, main = title.random.org)
 
 ***What does the histogram tell you about the distribution? Is it consistent with the goal of simulation?***
 
-In other words, we know that our goal is a unified distribution on [0,1]. In a unified distribution on [0,1], as the size of the sample increases, the frequency of the outcomes should approach being equal, and their density should approach 1. 
+In this case, our goal was to simulate 100 random numbers having a continuous uniform distribution between [0,1], and we have used a binary sequence from a physical source, provided by the website Random.org, to produce our sample.
 
-Since the densities of our sample should approach 1 and be equal, their mean of course should also approach 1 and should not deviate excessively.
+As seen in the histogram, when we group our 100 numbers into bins of width one tenth (0.1), each of these bins holds between 5 and 15 numbers. We expect each bin to hold approximately 10 numbers (i.e. 100/10 = 10 and 1/10 = 0.1). Our smaller sample based on Random.org appears to hold more variation, but the central tendency of our bin frequency, which appears to be approximately 10 from observing the histogram, is consistent with our expectation.
 
-??? XXX ???
 
 Estimate mean and standard deviation of our sample's density.
 
@@ -173,6 +186,20 @@ abline(h = hist.random.org.mean - 1.96 * hist.random.org.sd, col = "red", lty = 
 ***What does the graph tell you about the observed distribution?***
 
 ??? XXX ???
+
+The density of a histogram is calculated for each bin by dividing the number of observations in that bin by the width of the bin. Here, we can compare the density of our sample histogram's bins with the theoretical probability density of a uniform distribution.
+
+We know that for a theoretical continuous uniform distribution, the probability density of each individual value inside its bounds is 1 divided by the distance between its maximum and minimum value. Thus for such a distribution between 0 and 1, the density for every value within its bounds will be 1 / (1-0), or simply 1.
+
+For a sample taken from a continuous uniform distribution, we therefore would expect each of our bins to have a density close to 1, since the probability density of such a distribution remains at 1 throughout its range of values. 
+
+Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins has a mean of 1 and further is within one standard deviation of 1. Thus the mean and central tendency of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
+
+??? XXX ???
+
+In other words, we know that our goal is a unified distribution on [0,1]. In a unified distribution on [0,1], as the size of the sample increases, the frequency of the outcomes should approach being equal, and their density should approach 1. 
+
+Since the densities of our sample should approach 1 and be equal, their mean of course should also approach 1 and should not deviate excessively.
 
 Estimate the moments of the sample.
 
@@ -201,7 +228,7 @@ Check if a sequence of numbers is i.i.d. (independent identically distributed) b
 
 The number of turning points is the number of maxima and minima in the series. The statistic of the test has a standard normal distribution and is performed by turning.point.test() in package randtests.
 
-```{r q2-2-1-load, results='hide'}
+```{r q2-2-1-load, message=FALSE}
 library(randtests)
 ```
 
@@ -264,12 +291,22 @@ We can confirm that the random sequences provided by Random.org pass the monobit
 
 ??? XXX ???
 
+```{r q3}
+sample.unif1 <- runif(1000, 0, 1)
+hist(sample.unif1)
+sample.binom <- qbinom(sample.unif1, size = 1, prob = 0.8)
+hist(sample.binom)
+sample.unif2 <- punif(sample.binom, 0, 1)
+hist(sample.unif2)
+```
+
+
 ## Part 4. Monte Carlo Method
 
 ## 4.1. Scratch off quote of the day: fuction download
 
-```{r q4-1-load, results='hide'}
-filename <- ScratchOffMonteCarlo.rda
+```{r q4-1-load, message=FALSE}
+filename <- "ScratchOffMonteCarlo.rda"
 
 #path <- "{Path to the folder with ScratchOffMonteCarlo.rda}"
 #load(file = paste(path, filename,sep= '/ '))
@@ -383,7 +420,7 @@ It appears we need to scratch off approximately 90% of the paint to make the quo
 
 We replace function runif() with sobol() from the library randtoolbox.
 
-```{r q4-3-load, results='hide'}
+```{r q4-3-load, message=FALSE}
 library(randtoolbox)
 ```
 
