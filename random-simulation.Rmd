@@ -9,7 +9,7 @@ output: pdf_document
 
 _Notes_
 
-* _Style Guide:_ https://google.github.io/styleguide/Rguide.xml#functiondefinition
+* _Style Guide:_ https://google.github.io/styleguide/Rguide.xml
 
 * _Packages required: random, compositions, randtests, randtoolbox._
 
@@ -34,7 +34,7 @@ quantile(sample.runif)
 
 ## 1.2. Simulate Uniform Random Sample on [0,1] Using Random.org.
 
-```{r q1.2-load1, message=FALSE}
+```{r q1.2-load1, message=FALSE, warning=FALSE}
 # Load random package to interface with random.org
 library(random)
 ```
@@ -49,7 +49,7 @@ head(data.random.org)
 
 **Let us turn our sequence of {0,1} into uniform random numbers on [0,1].**
 
-```{r q1.2-load2, message=FALSE}
+```{r q1.2-load2, message=FALSE, warning=FALSE}
 # Load compositions package
 suppressMessages(library(compositions))
 ```
@@ -102,16 +102,15 @@ boxplot(sample.runif, main = title.runif)
 
 Our goal was to simulate 1000 random numbers having a continuous uniform distribution between [0,1]. We have stored these 1000 numbers in a sample vector and graphed a histogram of this vector to examine whether we were successful.
 
-As seen in the histogram, when we group our 1000 numbers into bins of width one tenth (0.1), each of these bins holds approximately 100 numbers, with some variation. This is as expected (i.e. 1000/10 = 100 and 1/10 = 0.1). Our sample of continuous numbers appears to be evenly distributed between the bounds of 0 and 1, as expected for a distribution of X ~ Unif(0,1) and appears consistent with the goal of our simulation.
-
-
-Estimate mean and standard deviation of our sample's density.
+As seen in the histogram, when we group our 1000 numbers into bins of width one tenth (0.1), each of these bins holds approximately 100 numbers, with some variation. This is consistent with our goal (i.e. 1000/10 = 100 and 1/10 = 0.1). Our sample of continuous numbers appears to be evenly distributed between the bounds of 0 and 1, as expected for a distribution of X ~ Unif(0,1), and appears consistent with the goal of our simulation.
 
 ```{r q2-1-1-spread}
+# Estimate mean and standard deviation of our sample's density.
 (hist.runif.mean <- mean(hist.runif$density))
 (hist.runif.sd <- sd(hist.runif$density))
 
-plot(hist.runif, freq = FALSE, main = paste("Spread of", title.runif))
+# Plot our histogram again, adding mean and standard deviation to assist in interpreting spread.
+plot(hist.runif, freq = FALSE, main = paste("Variation of", title.runif))
 abline(h = hist.runif.mean)
 abline(h = hist.runif.mean + 1.96 * hist.runif.sd, col = "red", lty = 2)
 abline(h = hist.runif.mean - 1.96 * hist.runif.sd, col = "red", lty = 2)
@@ -127,31 +126,56 @@ For a sample taken from a continuous uniform distribution, we therefore would ex
 
 Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins has a mean of 1 and further is within one standard deviation of 1. Thus the mean and central tendency of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
 
-
-Estimate the moments of the sample.
-
 ```{r q2-1-1-moments}
+# Estimate the moments of the sample.
 (sample.runif.mean <- mean(sample.runif))
 (sample.runif.var <- var(sample.runif))
 ```
 
 ***What do you conclude about the estimated distribution from the moments?***
 
-The first moment (mean) and the second central moment (variance) tell us, respectively, the center of our sample and the spread of our sample. These are also as expected. 
+The first moment (mean) and the second central moment (variance) tell us, respectively, the center of our sample and the spread of our sample. These are also consistent with our goal. 
 
-For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of 0.516 is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or (1-0)/2). We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample mean of 0.084 is quite close to this.
-
-
-Check the summary of the simulated sample.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of 0.516 is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample mean of 0.084 is quite close to this.
 
 ```{r q2-1-1-iqr}
+# Check the summary of the simulated sample.
 summary(sample.runif)
 ```
 
 ***What do you think is the best way of estimating uniform distribution over unknown interval?***
 
-??? XXX ???
+Cosma Shalizi of [Carnegie Mellon University](http://www.stat.cmu.edu/~cshalizi/350/lectures/28/lecture-28.pdf) explains that the histogram is a rudimentary way of examining a distribution. "If we hold the bins fixed and take more and more data, then by the law of large numbers we anticipate that the relative frequency for each bin will converge on the bin’s probability."
 
+We have used three different methods of examining our sample data:
+* Examining the histogram of the data
+* Examining the spread of the histogram's bins through calculating their moments
+* Examining the interquartile range of the data (IQR)
+
+If we define **"estimating a distribution"** as estimating, for a given data set, both its distribution (which distribution the data appears to take) and its parameters (the parameters for the distribution we suspect), which of these methods is most helpful?
+
+Let's create a set of data with similar parameters which is *not* uniform as a basis of comparison.
+
+```{r q2-1-1-compare}
+sample.norm <- rnorm(1000, mean = 0.5, sd = 1/12)
+summary(sample.norm)
+hist.norm <- hist(sample.norm, main = "Normal Sample")
+
+hist.norm.mean <- mean(hist.norm$density)
+hist.norm.sd <- sd(hist.norm$density)
+
+# Plot our histogram again, adding mean and standard deviation to assist in interpreting spread.
+plot(hist.norm, freq = FALSE, main = "Spread of Normal Sample")
+abline(h = hist.norm.mean)
+abline(h = hist.norm.mean + 1.96 * hist.norm.sd, col = "red", lty = 2)
+abline(h = hist.norm.mean - 1.96 * hist.norm.sd, col = "red", lty = 2)
+```
+
+*How can we confirm that data is uniform?*
+
+For any uniform distribution we know that the frequency and the density of its values should be uniform across its range. 
+
+*How can we estimate its parameters?*
 
 ### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
 
@@ -177,7 +201,7 @@ Estimate mean and standard deviation of our sample's density.
 (hist.random.org.mean <- mean(hist.random.org$density))
 (hist.random.org.sd <- sd(hist.random.org$density))
 
-plot(hist.random.org, freq = FALSE, main = paste("Spread of", title.random.org))
+plot(hist.random.org, freq = FALSE, main = paste("Variation of", title.random.org))
 abline(h = hist.random.org.mean)
 abline(h = hist.random.org.mean + 1.96 * hist.random.org.sd, col = "red", lty = 2)
 abline(h = hist.random.org.mean - 1.96 * hist.random.org.sd, col = "red", lty = 2)
@@ -228,7 +252,7 @@ Check if a sequence of numbers is i.i.d. (independent identically distributed) b
 
 The number of turning points is the number of maxima and minima in the series. The statistic of the test has a standard normal distribution and is performed by turning.point.test() in package randtests.
 
-```{r q2-2-1-load, message=FALSE}
+```{r q2-2-1-load, message=FALSE, warning=FALSE}
 library(randtests)
 ```
 
@@ -305,7 +329,7 @@ hist(sample.unif2)
 
 ## 4.1. Scratch off quote of the day: fuction download
 
-```{r q4-1-load, message=FALSE}
+```{r q4-1-load, message=FALSE, warning=FALSE}
 filename <- "ScratchOffMonteCarlo.rda"
 
 #path <- "{Path to the folder with ScratchOffMonteCarlo.rda}"
@@ -420,7 +444,7 @@ It appears we need to scratch off approximately 90% of the paint to make the quo
 
 We replace function runif() with sobol() from the library randtoolbox.
 
-```{r q4-3-load, message=FALSE}
+```{r q4-3-load, message=FALSE, warning=FALSE}
 library(randtoolbox)
 ```
 
