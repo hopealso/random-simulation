@@ -318,7 +318,13 @@ We can confirm that the random sequences provided by Random.org pass the monobit
 
 Our goal in inventing a random number generator is to seek out a true source of a uniform random sequence on [0,1].
 
-One random event that is available all of those who live in a metropolitan area is the movement of cars on the roads that surround us. To generate our random sequence we combined the allure of statistics with the draw to spend time with our family, and spent two hours recording the movement of cars along a relatively busy throughfare in the North Center neighborhood of Chicago.
+One random event that is available all of those who live in a metropolitan area is the movement of cars on the roads that surround us. To generate our random sequence we combined the allure of statistics with the draw to spend time with our family, and spent roughly two hours recording the movement of cars along a relatively busy throughfare in the North Center neighborhood of Chicago.
+
+For our traffic-based Bernoulli sequence, we recorded a "success" or "failure" for each car (vehicle) that passed in front of our testing location until 1000 recordings were made. Each Eastward-bound car represents a "success" and each Westward-bound car represents a "failure".
+
+Anecdotally, we were also able to empirically estimate the length of recordings that a young elementary school student is able to retain focus on such an exercise at approximately 200 recordings, with additional predictors in the form of ambient noise from sibling YouTube activities and spousal snack preparation.
+
+### Data Import and Transformation
 
 Let's bring this data, recorded in Excel and saved as a .csv file, into R.
 
@@ -328,6 +334,10 @@ str(data.traffic)
 ```
 
 We can now convert the binary sequence of 1000 into 100 numbers on the interval [0,1], by interpreting each sequence of 10 numbers as a decimal.
+
+We'll create two transformations. After building a matrix of the binary values in the order that they were recorded, our first transformation will interpret sequences of 10 numbers in the order they were recorded along rows, and our second will interpret sequences of 10 numbers along the columns of the matrix. 
+
+The second transformation essentially "scrambles" our sequence. Given that the sequence as recorded included periodic repetitions of length 4-10 related to stop lights on either side of our location, we are curious as to whether the scrambled colunn-transformed sequence will produce a more uniform distribution.
 
 ```{r q3-transform}
 # Turn the sequence of 0's and 1's into a 100x10 matrix
@@ -354,22 +364,43 @@ sample.traffic.2
 quantile(sample.traffic.2)
 ```
 
+### Visualization
+
 Let's visualize the data as an initial analysis.
 
 ```{r q3-visualize}
 # Histogram of our transformed data
 title.traffic.1 <- "100 Random Numbers Row-Transformed from Binary Traffic Flow Sequence"
 hist.traffic.1 <- hist(sample.traffic.1, main = title.traffic.1)
-hist.traffic.1
+#hist.traffic.1
 
 title.traffic.2 <- "100 Random Numbers Column-Transformed from Binary Traffic Flow Sequence"
 hist.traffic.2 <- hist(sample.traffic.2, main = title.traffic.2)
-hist.traffic.2
+#hist.traffic.2
+
+# Estimate mean and standard deviation of our sample's density.
+(hist.traffic.1.mean <- mean(hist.traffic.1$density))
+(hist.traffic.1.sd <- sd(hist.traffic.1$density))
+
+plot(hist.traffic.1, freq = FALSE, ylim = c(0, 2), 
+     main = paste("Density Variation of", title.traffic.1))
+abline(h = hist.traffic.1.mean)
+abline(h = hist.traffic.1.mean + 1.96 * hist.traffic.1.sd, col = "red", lty = 2)
+abline(h = hist.traffic.1.mean - 1.96 * hist.traffic.1.sd, col = "red", lty = 2)
+
+(hist.traffic.2.mean <- mean(hist.traffic.2$density))
+(hist.traffic.2.sd <- sd(hist.traffic.2$density))
+
+plot(hist.traffic.2, freq = FALSE, ylim = c(0, 2), 
+     main = paste("Density Variation of", title.traffic.2))
+abline(h = hist.traffic.2.mean)
+abline(h = hist.traffic.2.mean + 1.96 * hist.traffic.2.sd, col = "red", lty = 2)
+abline(h = hist.traffic.2.mean - 1.96 * hist.traffic.2.sd, col = "red", lty = 2)
 ```
 
 And finally we'll look at our moments.
 
-### Row-Transformed
+***Row-Transformed***
 
 ```{r q3-row-moments}
 # Estimate the moments of the sample.
@@ -377,9 +408,9 @@ And finally we'll look at our moments.
 (sample.traffic.1.var <- var(sample.traffic.1))
 ```
 
-For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.1.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.1.var` is quite close to this.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.1.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.1.var` is relatively close to this.
 
-### Column-Transformed
+***Column-Transformed***
 
 ```{r q3-column-moments}
 # Estimate the moments of the sample.
@@ -387,17 +418,24 @@ For a uniform distribution we expect that the center of our data will be midway 
 (sample.traffic.2.var <- var(sample.traffic.2))
 ```
 
-For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.2.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.2.var` is quite close to this.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.2.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.2.var` is relatively close to this.
 
-```{r q3}
-sample.unif1 <- runif(1000, 0, 1)
-hist(sample.unif1)
-sample.binom <- qbinom(sample.unif1, size = 1, prob = 0.8)
-hist(sample.binom)
-sample.unif2 <- punif(sample.binom, 0, 1)
-hist(sample.unif2)
+***Overall Perception***
+
+It appears that our data is very nearly random, yet both transformations contain an outlier value that pulls the data outside its expected uniform density and pulls the moments slightly askew of our expectations for a uniform distribution. 
+
+### Tests for Randomness
+
+Now that we have observed the data somewhat informally, let's test for randomness using the Turning Point and Monobit tests.
+
+#### Turning Point
+
+```{r q3-turning-pt}
+turning.point.test(sample.traffic.1)
+turning.point.test(sample.traffic.2)
 ```
 
+The null hypothesis tested by turning point test is randomness (i.i.d.). The alternative is serial correlation in the sequence. Thus, if the test returns a very small p-value the randomness needs to be rejected.
 
 ## Part 4. Monte Carlo Method
 
