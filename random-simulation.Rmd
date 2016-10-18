@@ -307,7 +307,14 @@ We can confirm that the random sequences provided by Random.org pass the monobit
 
 ## Part 3. Invent a random number generator
 
-??? XXX ???
+Our goal in inventing a random number generator is to seek out a true source of a uniform random sequence on [0,1]. One random event that is available all of those who live in a metropolitan area is the movement of cars on the roads that surround us. To generate our random sequence we combined the draw of statistics with the draw to spend time with our family, and spent two hours recording the movement of cars along a relatively busy throughfare in the North Center neighborhood of Chicago.
+
+Let's bring this data, recorded in Excel, into R.
+
+```{r q3-import}
+
+```
+
 
 ```{r q3}
 sample.unif1 <- runif(1000, 0, 1)
