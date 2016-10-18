@@ -122,9 +122,13 @@ The density of a histogram is calculated for each bin by dividing the number of 
 
 We know that for a theoretical continuous uniform distribution, the probability density of each individual value inside its bounds is 1 divided by the distance between its maximum and minimum value. Thus for such a distribution between 0 and 1, the density for every value within its bounds will be 1 / (1-0), or simply 1.
 
-For a sample taken from a continuous uniform distribution, we therefore would expect each of our bins to have a density close to 1, since the probability density of such a distribution remains at 1 throughout its range of values. 
+For a sample taken from a continuous uniform distribution, we therefore would expect each of our bins to have a density close to 1, since the probability density of such a distribution remains at 1 throughout its range of values.
 
-Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins has a mean of 1 and further is within one standard deviation of 1. Thus the mean and central tendency of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
+In other words, we know that our goal is a unified distribution on [0,1]. In a unified distribution on [0,1], as the size of the sample increases, the frequency of the outcomes should approach being equal, and their density should approach 1. 
+
+Since the densities of our sample (read, the densities of the bins of our histogram) should approach 1 and be equal, their mean of course should also approach 1 and density across values (bins) should not deviate excessively.
+
+Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins is measured with mean of 1 and further our bin densities are within one standard deviation of 1. Thus the central tendency and variation of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
 
 ```{r q2-1-1-moments}
 # Estimate the moments of the sample.
@@ -136,7 +140,7 @@ Examining the empirical density of our sample as diagrammed on our histogram, we
 
 The first moment (mean) and the second central moment (variance) tell us, respectively, the center of our sample and the spread of our sample. These are also consistent with our goal. 
 
-For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of 0.516 is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample mean of 0.084 is quite close to this.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.runif.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.runif.var` is quite close to this.
 
 ```{r q2-1-1-iqr}
 # Check the summary of the simulated sample.
@@ -149,33 +153,41 @@ Cosma Shalizi of [Carnegie Mellon University](http://www.stat.cmu.edu/~cshalizi/
 
 We have used three different methods of examining our sample data:
 * Examining the histogram of the data
-* Examining the spread of the histogram's bins through calculating their moments
+* Examining the spread of the histogram's bins
+* Examining the moments of the data itself
 * Examining the interquartile range of the data (IQR)
 
-If we define **"estimating a distribution"** as estimating, for a given data set, both its distribution (which distribution the data appears to take) and its parameters (the parameters for the distribution we suspect), which of these methods is most helpful?
-
-Let's create a set of data with similar parameters which is *not* uniform as a basis of comparison.
-
-```{r q2-1-1-compare}
-sample.norm <- rnorm(1000, mean = 0.5, sd = 1/12)
-summary(sample.norm)
-hist.norm <- hist(sample.norm, main = "Normal Sample")
-
-hist.norm.mean <- mean(hist.norm$density)
-hist.norm.sd <- sd(hist.norm$density)
-
-# Plot our histogram again, adding mean and standard deviation to assist in interpreting spread.
-plot(hist.norm, freq = FALSE, main = "Spread of Normal Sample")
-abline(h = hist.norm.mean)
-abline(h = hist.norm.mean + 1.96 * hist.norm.sd, col = "red", lty = 2)
-abline(h = hist.norm.mean - 1.96 * hist.norm.sd, col = "red", lty = 2)
-```
+If we define **"estimating a distribution"** as estimating, for a given data set, both its distribution (which distribution the data appears to take) and its parameters (the parameters for the distribution we suspect), are these methods helpful?
 
 *How can we confirm that data is uniform?*
 
-For any uniform distribution we know that the frequency and the density of its values should be uniform across its range. 
+For any uniform distribution we know that the frequency and the density of its values should be uniform across its range. This is a distinct distribution, so eyeballing the histogram gives us a good sense of whether we can suspect a uniform distribution.
+
+We have gone one step further by calculating the mean and standard deviation of our histogram's bins. In contrast with the mean and standard deviation of the data itself, these tell us about the extent to which our bin density varies from the expected mean of 1. This method seems particularly useful for identifying a uniform distribution as it answers the question, "Is the density across all values spread narrowly and close to 1?" If our density varies widely across our data points (i.e. the bins of our histogram), we know that the distribution cannot be uniform.
+
+Thus, for identifying a uniform distribution, this is a more useful value than calculating the mean or standard deviation of the data itself. A uniform distribution spread across an unknown interval could have a very large standard deviation. But the standard deviation of its density (e.g. how much does the density of the bins themselves vary) will remain narrow.
+
+The mean and standard deviation of the data itself can still give us a hint, as we do know how to calculate these values for a uniform distribution on any interval. However they alone cannot identify a uniform distribution, as demonstrated by the normal distribution below, which has a mean and standard deviation that matches our distribution on Unif(0,1).
+
+```{r q2-1-1-compare}
+sample.norm <- rnorm(1000, mean = 0.5, sd = sqrt(1/12))
+summary(sample.norm)
+hist.norm <- hist(sample.norm, main = "Normal Sample")
+
+(paste("Unif mean: ", sample.runif.mean))
+(paste("Unif variance: ", sample.runif.var))
+
+(paste("Normal mean: ", mean(sample.norm)))
+(paste("Normal variance: ", var(sample.norm)))
+```
+
+To identify a uniform distribution, it appears we need to look at not just the moments of the sample itself but also the variation of the calculated frequencies or densities across the data points.
 
 *How can we estimate its parameters?*
+
+Estimating the parameters of a uniform distribution is a different problem. We cannot estimate the minimum and maximum of a distribution in the same way that we identified the distribution. Knowing that the density of our histogram's bins is centered narrowly around zero will be true for any uniform distribution of any interval.
+
+However, if we know the minimum, maximum, mean and standard deviation of the distribution, it seems we can come close to estimating the minimum and maximum. We may need to make some assumptions regarding just how far extended from the bounds of our sample the distribution in question may be.
 
 ### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
 
@@ -192,12 +204,10 @@ boxplot(sample.random.org, main = title.random.org)
 
 In this case, our goal was to simulate 100 random numbers having a continuous uniform distribution between [0,1], and we have used a binary sequence from a physical source, provided by the website Random.org, to produce our sample.
 
-As seen in the histogram, when we group our 100 numbers into bins of width one tenth (0.1), each of these bins holds between 5 and 15 numbers. We expect each bin to hold approximately 10 numbers (i.e. 100/10 = 10 and 1/10 = 0.1). Our smaller sample based on Random.org appears to hold more variation, but the central tendency of our bin frequency, which appears to be approximately 10 from observing the histogram, is consistent with our expectation.
-
-
-Estimate mean and standard deviation of our sample's density.
+As seen in the histogram, when we group our 100 numbers into bins of width one tenth (0.1), each of these bins holds between 5 and 15 numbers. We expect each bin to hold approximately 10 numbers (i.e. 100/10 = 10 and 1/10 = 0.1). Our smaller sample based on Random.org appears to hold more variation, but the central tendency of our bin frequency, which appears to be approximately 10 from observing the histogram, is consistent with our goal.
 
 ```{r q2-1-2-spread}
+# Estimate mean and standard deviation of our sample's density.
 (hist.random.org.mean <- mean(hist.random.org$density))
 (hist.random.org.sd <- sd(hist.random.org$density))
 
@@ -209,40 +219,24 @@ abline(h = hist.random.org.mean - 1.96 * hist.random.org.sd, col = "red", lty = 
 
 ***What does the graph tell you about the observed distribution?***
 
-??? XXX ???
-
-The density of a histogram is calculated for each bin by dividing the number of observations in that bin by the width of the bin. Here, we can compare the density of our sample histogram's bins with the theoretical probability density of a uniform distribution.
-
-We know that for a theoretical continuous uniform distribution, the probability density of each individual value inside its bounds is 1 divided by the distance between its maximum and minimum value. Thus for such a distribution between 0 and 1, the density for every value within its bounds will be 1 / (1-0), or simply 1.
-
-For a sample taken from a continuous uniform distribution, we therefore would expect each of our bins to have a density close to 1, since the probability density of such a distribution remains at 1 throughout its range of values. 
-
-Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins has a mean of 1 and further is within one standard deviation of 1. Thus the mean and central tendency of these bins are consistent with a continuous uniform distribution on [0,1] and our goal.
-
-??? XXX ???
-
-In other words, we know that our goal is a unified distribution on [0,1]. In a unified distribution on [0,1], as the size of the sample increases, the frequency of the outcomes should approach being equal, and their density should approach 1. 
-
-Since the densities of our sample should approach 1 and be equal, their mean of course should also approach 1 and should not deviate excessively.
-
-Estimate the moments of the sample.
+Once again, Examining the empirical density of our sample as diagrammed on our histogram, we can see that the central tendency of our 10 bins is measured with mean of 1 and further our bin densities are within one standard deviation of 1. Though this smaller sample of 100 shows more variation than our earlier sample of 1000, the central tendency and variation of these bins remains approximately consistent with a continuous uniform distribution on [0,1] and our goal. 
 
 ```{r q2-1-2-moments}
+# Estimate the moments of the sample.
 (sample.random.org.mean <- mean(sample.random.org))
 (sample.random.org.var <- var(sample.random.org))
 ```
 
 ***What do you conclude about the estimated distribution from the moments?***
 
-??? XXX ???
-
-Check the summary of the simulated sample.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.random.org.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.random.org.var` is quite close to this.
 
 ```{r q2-1-2-iqr}
+# Check the summary of the simulated sample.
 summary(sample.random.org)
 ```
 
-??? XXX ???
+Using the same methods to examine our random.org sample as we did our runif sample, we noted that the latter, being a sample of 100 rather than 1000, resulted in greater variation and demonstrated less strongly the expected parameters of a uniform distribution. However, given than 100 is a relatively small sample size, we suspect that given the law of large numbers that the variations we saw would even themselves out with a larger sample.
 
 ## 2.2. Test independence of the sequence of zeros and ones
 
