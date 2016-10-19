@@ -2,7 +2,11 @@
 title: "Statistical Analysis, MSCA 31007, Lecture 2"
 author: "Hope Foster-Reyes"
 date: "October 7, 2016"
-output: pdf_document
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+geometry: margin=0.75in
 ---
 
 # Simulation of Random Variables
@@ -195,7 +199,7 @@ To identify a uniform distribution, it appears we need to look at not just the m
 
 Estimating the parameters of a uniform distribution is a different problem. We cannot estimate the minimum and maximum of a distribution in the same way that we identified the distribution. Knowing that the density of our histogram's bins is centered narrowly around its mean will be true for any uniform distribution of any interval.
 
-However, if we know the minimum, maximum, mean and standard deviation of the sample, it seems we can come close to estimating the minimum and maximum of its population distribution. We may need to make some assumptions regarding just how far extended from the bounds of our sample the distribution in question may be.
+However, if we know the minimum, maximum, mean and standard deviation of the sample, it seems we can come close to estimating the minimum and maximum of its hypothesized population distribution. We may need to make some assumptions regarding just how far extended from the bounds of our sample the distribution in question may be.
 
 ### 2.1.2. Repeat the same steps to test uniformity of the sample created from Random.org data.
 
@@ -273,7 +277,7 @@ To perform Monobit test you need to transform your {0,1} sample into {-1,1}.
 data.random.org.plusminus1 <- (data.random.org - .5) * 2
 ```
 
-The monobit test can be calculated in R with the help of pnorm. The test checks that the the p-value or complimentary error function of a statistic S is less than or equal to 0.01. If not, the sequence fails the test.
+The monobit test can be calculated in R with the help of pnorm. The test checks that the the p-value or complimentary error function of a statistic S is less than or equal to 0.01. If so, the sequence fails the test.
 
 ```{r q2-3}
 erf.monobit <- function(x) 2 * pnorm(x * sqrt(2)) - 1
@@ -331,7 +335,30 @@ Let's bring this data, recorded in Excel and saved as a .csv file, into R.
 ```{r q3-import}
 data.traffic <- read.csv("cars.csv", header = TRUE)
 str(data.traffic)
+traffic.n <- nrow(data.traffic)
+``` 
+
+And let's take a look at our raw binary distribution.
+
+```{r q3-raw}
+data.traffic.density <- table(data.traffic$Eastward.Bound) / traffic.n
+barplot(data.traffic.density, space = 0, ylab = "Probability Density", 
+        main="Directional Traffic Flow")
 ```
+
+As we recorded our data, we casually noted that the proportion of traffic flowing in either direction seemed to grow unbalanced as the time grew later on the Sunday afternoon in which we conducted our experiment. Let's check if this observation was accurate to the data.
+
+```{r q3-time}
+data.traffic.density.early <- table(data.traffic$Eastward.Bound[1:500]) / 500
+barplot(data.traffic.density.early, space = 0, ylab = "Probability Density", 
+        main="Early Directional Traffic Flow")
+
+data.traffic.density.late <- table(data.traffic$Eastward.Bound[501:1000]) / 500
+barplot(data.traffic.density.late, space = 0, ylab = "Probability Density", 
+        main="Late Directional Traffic Flow")
+```
+
+This difference may impact our findings, but it's too costly (time is money!) to record a new data set, and we are hesitant to use only 500 observations, i.e. the first half of our data. Let's proceed with the full data set for now.
 
 We can now convert the binary sequence of 1000 into 100 numbers on the interval [0,1], by interpreting each sequence of 10 numbers as a decimal.
 
@@ -370,12 +397,12 @@ Let's visualize the data as an initial analysis.
 
 ```{r q3-visualize}
 # Histogram of our transformed data
-title.traffic.1 <- "100 Random Numbers Row-Transformed from Binary Traffic Flow Sequence"
-hist.traffic.1 <- hist(sample.traffic.1, main = title.traffic.1)
+title.traffic.1 <- "100 Decimals Row-Transformed from Binary Traffic Sequence"
+hist.traffic.1 <- hist(sample.traffic.1, main = title.traffic.1, plot = FALSE)
 #hist.traffic.1
 
-title.traffic.2 <- "100 Random Numbers Column-Transformed from Binary Traffic Flow Sequence"
-hist.traffic.2 <- hist(sample.traffic.2, main = title.traffic.2)
+title.traffic.2 <- "100 Decimals Column-Transformed from Binary Traffic Sequence"
+hist.traffic.2 <- hist(sample.traffic.2, main = title.traffic.2, plot = FALSE)
 #hist.traffic.2
 
 # Estimate mean and standard deviation of our sample's density.
@@ -418,11 +445,11 @@ For a uniform distribution we expect that the center of our data will be midway 
 (sample.traffic.2.var <- var(sample.traffic.2))
 ```
 
-For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.2.mean` is quite close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.2.var` is relatively close to this.
+For a uniform distribution we expect that the center of our data will be midway through the range of the distribution. Thus the sample mean of `r sample.traffic.2.mean` is relatively close to our expected theoretical mean of 0.5 (midway between 0 and 1, or $\frac{(1-0)}{2}$. We expect that the variance of our data will be $\frac{(b-a)^{2}}{12}$, or 1/12, and our sample variance of `r sample.traffic.2.var` is relatively close to this.
 
 ***Overall Perception***
 
-It appears that our data is very nearly random, yet both transformations contain an outlier value that pulls the data outside its expected uniform density and pulls the moments slightly askew of our expectations for a uniform distribution. 
+It appears that our data is very nearly unified, yet both transformations seem to contain repeated values or some other factor that pulls the data outside expected uniform behavior and pulls the moments slightly askew of our expectations for a uniform distribution. 
 
 ### Tests for Randomness
 
@@ -436,6 +463,77 @@ turning.point.test(sample.traffic.2)
 ```
 
 The null hypothesis tested by turning point test is randomness (i.i.d.). The alternative is serial correlation in the sequence. Thus, if the test returns a very small p-value the randomness needs to be rejected.
+
+#### Monobit
+
+To perform Monobit test we need to transform our {0,1} sample into {-1,1}.
+
+```{r q3-monobit-transform}
+data.traffic.plusminus1 <- (data.traffic$Eastward.Bound - .5) * 2
+```
+
+The monobit test can be calculated in R with the help of pnorm. The test checks that the the p-value or complimentary error function of a statistic S is less than or equal to 0.01. If so, the sequence fails the test.
+
+```{r q3-monobit}
+erf.monobit <- function(x) 2 * pnorm(x * sqrt(2)) - 1
+erfc.monobit <- function(x) 2 * pnorm(x * sqrt(2), lower = FALSE)
+
+# Chart the complimentary error function
+plot(seq(from = -3, to = 3, by = 0.5), erfc.monobit(seq(from = -3, to = 3, by = 0.5)),
+     type = "l", xlab = "x", ylab = "erfc.monobit(x)")
+
+# Calculate our S statistic
+s.monobit.traffic <- abs(sum(data.traffic.plusminus1) / sqrt(2*traffic.n))
+
+# Find the p-value or erfc(S)
+erfc.monobit(s.monobit.traffic)
+```
+
+Our P-value is greater than 0.01. The test shows that our sequence passes.
+
+Now check each of the sub-sequences created earlier:
+
+*** Row Transformed ***
+
+```{r q3-monobit-subsseq-row}
+# Create matrix of sub-sequences
+matrix.plusminus1 <- matrix(data.traffic.plusminus1, ncol=10)
+
+# Find p-value of vector of S statistics for every sub-sequence
+erfc.traffic.1.subseq <- erfc.monobit(abs(apply(matrix.plusminus1, 1, sum)) / sqrt(2 * 10))
+
+# Plot
+plot(erfc.traffic.1.subseq, ylab = "P-Values", 
+     main = "Monobit Function on 100 Row-Transformed Sequences of Traffic Flow Data")
+```
+
+How many of the 100 row-transformed sequences fail the test?
+
+```{r q3-monobit-subseq-row-test}
+sum(erfc.traffic.1.subseq <= 0.01)
+```
+
+*** Column-Transformed ***
+
+```{r q3-monobit-subsseq-col}
+# Create matrix of sub-sequences
+matrix.plusminus1 <- matrix(data.traffic.plusminus1, ncol=100)
+
+# Find p-value of vector of S statistics for every sub-sequence
+erfc.traffic.2.subseq <- erfc.monobit(abs(apply(matrix.plusminus1, 2, sum)) / sqrt(2 * 10))
+
+# Plot
+plot(erfc.traffic.2.subseq, ylab = "P-Values", 
+     main = "Monobit Function on 100 column-Transformed Sequences of Traffic Flow Data")
+```
+
+How many of the 100 column-transformed sequences fail the test?
+
+```{r q3-monobit-subseq-col-test}
+sum(erfc.traffic.2.subseq <= 0.01)
+```
+
+Interestingly, the sequences which we intentionally "scrambled" thinking that they would be more random were actually less random.
 
 ## Part 4. Monte Carlo Method
 
@@ -470,6 +568,7 @@ mc.xy <- runif(2 * mc.n, min = 0, max = 100)
 mc.xy <- matrix(mc.xy, ncol = 2)
 str(mc.xy)
 head(mc.xy)
+plot(mc.xy)
 
 # Simulate 'scratching off the paint' covering an image at each x, y coordinate
 ScratchOffMonteCarlo(mc.xy)
@@ -477,7 +576,7 @@ ScratchOffMonteCarlo(mc.xy)
 
 Let's adjust the sample size and seed and try to make the quote in our image readable with minimum sample size.
 
-```{r q4-1-trials}
+```{r q4-1-trials, fig.width=8, fig.asp=0.5}
 # Create function to generate coordinate matrix
 xy <- function(n, seed) {
   # Argument n: Number of x, y coordinate samples to generate
@@ -492,60 +591,40 @@ xy <- function(n, seed) {
 }
 
 # Seed 1 5k:
-mc.n <- 5000
-mc5k.xy <- xy(mc.n, seed1)
-ScratchOffMonteCarlo(mc5k.xy)
+mc.n <- 5000; mc5k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc5k.xy)
 
 # Seed 2 5k:
-seed2 <- 112233
-mc5k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc5k.xy)
+seed2 <- 112233; mc5k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc5k.xy)
 
 # Seed 1 10k:
-mc.n <- 10000
-mc10k.xy <- xy(mc.n, seed1)
-ScratchOffMonteCarlo(mc10k.xy)
+mc.n <- 10000; mc10k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc10k.xy)
 
 # Seed 2 10k:
-mc10k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc10k.xy)
+mc10k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc10k.xy)
 
 # Seed 1 15k:
-mc.n <- 15000
-mc15k.xy <- xy(mc.n, seed1)
-ScratchOffMonteCarlo(mc15k.xy)
+mc.n <- 15000; mc15k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 2 15k:
-mc15k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc15k.xy)
+mc15k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 3 15k:
-seed3 <- 999999
-mc15k.xy <- xy(mc.n, seed3)
-ScratchOffMonteCarlo(mc15k.xy)
+seed3 <- 999999; mc15k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc15k.xy)
 
 # Seed 2 19k:
-mc.n <- 19000
-mc19k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc19k.xy)
+mc.n <- 19000; mc19k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc19k.xy)
 
 # Seed 2 23k:
-mc.n <- 23000
-mc23k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc23k.xy)
+mc.n <- 23000; mc23k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc23k.xy)
 
-# Seed 2 25k:
-mc.n <- 25000
-mc25k.xy <- xy(mc.n, seed2)
-ScratchOffMonteCarlo(mc25k.xy)
+# Seed 2 25k:; mc.n <- 25000
+mc25k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc25k.xy)
 
 # Seed 1 25k:
-mc25k.xy <- xy(mc.n, seed1)
-ScratchOffMonteCarlo(mc25k.xy)
+mc25k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc25k.xy)
 
 # Seed 3 25k:
-mc25k.xy <- xy(mc.n, seed3)
-ScratchOffMonteCarlo(mc25k.xy)
+mc25k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc25k.xy)
 ```
 
 ***What percent you needed to scratch off to make the quote readable?***
@@ -560,15 +639,31 @@ We replace function runif() with sobol() from the library randtoolbox.
 library(randtoolbox)
 ```
 
-```{r}
+```{r q4-3-demo}
 seed4 <- 10
 set.seed(seed4)
 mc.n <- 10
 mc10.xy <- sobol(mc.n, dim = 2, init = T) * 100
+head(mc10.xy)
+plot(mc10.xy)
 ```
 
-
 Again, by changing nSample and my.seed we try to make the quote of the day readable with minimum sample size.
+
+```{r q4-3-trials}
+mc.n <- 800
+mc800.xy<-sobol(mc.n, dim = 2, init = T, scrambling = T, seed = seed4) * 100
+head(mc800.xy)
+plot(mc800.xy)
+
+ScratchOffMonteCarlo(mc800.xy)
+
+# Seed 4 5k:
+mc.n <- 5000; mc5k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc5k.xy)
+
+# Seed 1 5k:
+seed2 <- 112233; mc5k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc5k.xy)
+```
 
 ***What percent you needed to scratch off to make the quote readable?***
 
@@ -577,19 +672,6 @@ Again, by changing nSample and my.seed we try to make the quote of the day reada
 ***Which parameters nSample and my.seed gave you the best result, what percent of the yellow paing you were able to scratch off by each method?***
 
 ***Changing which of the two parameters plays more significant role?***
-
-## Workshop: Simulation of random variables using distribution function and inverse distribution function
-
-```{r inv-function-norm}
-xNorm<-qnorm((1:99)/100)
-yNorm<-pnorm(xNorm)
-plot(xNorm,yNorm,pch=16)
-abline(h=yNorm)
-abline(v=xNorm)
-abline(h=yNorm[30],col="green",lwd=3)
-abline(v=xNorm[30],col="green",lwd=3)
-lines(xNorm,dnorm(xNorm),lwd=3,col="red")
-```
 
 ## Part 5. Test
 
