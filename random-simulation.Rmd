@@ -576,7 +576,7 @@ ScratchOffMonteCarlo(mc.xy)
 
 Let's adjust the sample size and seed and try to make the quote in our image readable with minimum sample size.
 
-```{r q4-1-trials, fig.width=8, fig.asp=0.5}
+```{r q4-1-trials, fig.height = 3.375, fig.width = 4.875}
 # Create function to generate coordinate matrix
 xy <- function(n, seed) {
   # Argument n: Number of x, y coordinate samples to generate
@@ -659,7 +659,8 @@ plot(mc800.xy)
 ScratchOffMonteCarlo(mc800.xy)
 
 # Seed 4 5k:
-mc.n <- 5000; mc5k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc5k.xy)
+mc.n <- 5000; mc5k.xy <- sobol(mc.n, dim = 2, init = F, scrambling = T, seed = seed1) * 100
+ScratchOffMonteCarlo(mc5k.xy)
 
 # Seed 1 5k:
 seed2 <- 112233; mc5k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc5k.xy)
