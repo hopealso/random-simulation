@@ -576,7 +576,7 @@ ScratchOffMonteCarlo(mc.xy)
 
 Let's adjust the sample size and seed and try to make the quote in our image readable with minimum sample size.
 
-```{r q4-1-trials, fig.height = 3.375, fig.width = 4.875}
+```{r q4-1-trials}
 # Create function to generate coordinate matrix
 xy <- function(n, seed) {
   # Argument n: Number of x, y coordinate samples to generate
@@ -590,41 +590,23 @@ xy <- function(n, seed) {
   xy <- matrix(xy, ncol = 2)
 }
 
-# Seed 1 5k:
-mc.n <- 5000; mc5k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc5k.xy)
-
-# Seed 2 5k:
-seed2 <- 112233; mc5k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc5k.xy)
-
 # Seed 1 10k:
 mc.n <- 10000; mc10k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc10k.xy)
 
 # Seed 2 10k:
-mc10k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc10k.xy)
+seed2 <- 112233; mc10k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc10k.xy)
 
-# Seed 1 15k:
-mc.n <- 15000; mc15k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc15k.xy)
+# Seed 1 20k:
+mc.n <- 20000; mc20k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc20k.xy)
 
-# Seed 2 15k:
-mc15k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc15k.xy)
+# Seed 2 20k:
+mc20k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc20k.xy)
 
-# Seed 3 15k:
-seed3 <- 999999; mc15k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc15k.xy)
+# Seed 3 20k:
+seed3 <- 999999; mc20k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc20k.xy)
 
-# Seed 2 19k:
-mc.n <- 19000; mc19k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc19k.xy)
-
-# Seed 2 23k:
-mc.n <- 23000; mc23k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc23k.xy)
-
-# Seed 2 25k:; mc.n <- 25000
+# Seed 2 25k:
 mc25k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc25k.xy)
-
-# Seed 1 25k:
-mc25k.xy <- xy(mc.n, seed1); ScratchOffMonteCarlo(mc25k.xy)
-
-# Seed 3 25k:
-mc25k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc25k.xy)
 ```
 
 ***What percent you needed to scratch off to make the quote readable?***
@@ -659,20 +641,37 @@ plot(mc800.xy)
 ScratchOffMonteCarlo(mc800.xy)
 
 # Seed 4 5k:
-mc.n <- 5000; mc5k.xy <- sobol(mc.n, dim = 2, init = F, scrambling = T, seed = seed1) * 100
+mc.n <- 5000; mc5k.xy <- sobol(mc.n, dim = 2, init = T, scrambling = T, seed = seed4) * 100
 ScratchOffMonteCarlo(mc5k.xy)
 
-# Seed 1 5k:
-seed2 <- 112233; mc5k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc5k.xy)
+# Seed 4 15k:
+mc.n <- 15000; mc15k.xy <- sobol(mc.n, dim = 2, init = T, scrambling = T, seed = seed4) * 100
+ScratchOffMonteCarlo(mc15k.xy)
+
+# Seed 1 15k:
+mc15k.xy <- sobol(mc.n, dim = 2, init = T, scrambling = T, seed = seed1) * 100
+ScratchOffMonteCarlo(mc15k.xy)
+
+# Seed 1 16k:
+mc.n <- 16000; mc16k.xy <- sobol(mc.n, dim = 2, init = T, scrambling = T, seed = seed1) * 100
+ScratchOffMonteCarlo(mc16k.xy)
 ```
 
 ***What percent you needed to scratch off to make the quote readable?***
 
 ***Which of the Monte Carlo methods makes the quote readable sooner?***
 
-***Which parameters nSample and my.seed gave you the best result, what percent of the yellow paing you were able to scratch off by each method?***
+***Which parameters nSample and my.seed gave you the best result, what percent of the yellow paint you were able to scratch off by each method?***
+
+
 
 ***Changing which of the two parameters plays more significant role?***
+
+While changing the seed altered the particular dispersion of paint that was covered and sometimes revealed letters that gave more useful clues, this effect (of making the quote more readable through changing the seed) had more to do with the randomness of the letters made readable and its impact on typoglycemia. Typoglycemia is the psycholinguistic phenomenon of being able to read words without each letter or with the letters being scrambled. 
+
+Humans, as described by this phenomenon, do not actually read every letter, but instead process key letters. When we change the seed, roughly the same amount of paint is scratched and roughly the same number of letters. However, *different* letters are revealed. Therefore typoglycemia and randomness is largely responsible for any increased ability to read the quote due to changing the seed.
+
+This effect is far less significant than the effect of altering the sample size, which has the effect of increasing the % of the image revealed, and correspondingly the number of readable letters. The more readable letters, the more we can read, though clearly due to typoglycemia not all letters must be distinguishable in order for our brain to link the sequence to recognizable patterns.
 
 ## Part 5. Test
 
