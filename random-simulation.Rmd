@@ -606,7 +606,7 @@ mc20k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc20k.xy)
 seed3 <- 999999; mc20k.xy <- xy(mc.n, seed3); ScratchOffMonteCarlo(mc20k.xy)
 
 # Seed 2 25k:
-mc25k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc25k.xy)
+mc.n <- 25000; mc25k.xy <- xy(mc.n, seed2); ScratchOffMonteCarlo(mc25k.xy)
 ```
 
 ***What percent you needed to scratch off to make the quote readable?***
@@ -659,11 +659,15 @@ ScratchOffMonteCarlo(mc16k.xy)
 
 ***What percent you needed to scratch off to make the quote readable?***
 
+We need approximately the same percent of the image scratched off to make the quote readable, roughly 90%.
+
 ***Which of the Monte Carlo methods makes the quote readable sooner?***
+
+The 90% open hurdle is reached with far fewer "scratches" or data points using the Sobol method vs. the runif() method.
 
 ***Which parameters nSample and my.seed gave you the best result, what percent of the yellow paint you were able to scratch off by each method?***
 
-
+??? XXX ???
 
 ***Changing which of the two parameters plays more significant role?***
 
